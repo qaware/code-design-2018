@@ -18,13 +18,6 @@
 
         var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
-        function preload() {
-            game.load.image('background', 'assets/background.png');
-            game.load.image('racket', 'assets/racket.png');
-            game.load.image('ball', 'assets/ball.png');
-            game.load.image('brick', 'assets/brick.png');
-        }
-
         // Schläger
         var racket;
         // Ball
@@ -44,9 +37,23 @@
         var scoreText;
         // Geschwindigkeit des Balls
         var ballSpeed = 200;
-
+        // Geschwindigkeit des Schlägers
+        var racketSpeed = 200;
         // Ist der Ball aktuell in der Startposition?
         var holdBall = true;
+        // Aktive Powerups
+        var activePowerups = []
+
+        /*
+         * Wird von Phaser beim Laden des Spiels aufgerufen.
+         */
+        function preload() {
+            game.load.image('background', 'assets/background.png');
+            game.load.image('racket', 'assets/racket.png');
+            game.load.image('ball', 'assets/ball.png');
+            game.load.image('brick', 'assets/brick.png');
+            game.load.image('powerup-speed', 'assets/powerup-speed.png');
+        }
 
         /*
          * Wird von Phaser beim Spielstart aufgerufen.
@@ -59,7 +66,7 @@
             game.physics.arcade.checkCollision.down = false;
 
             // Schläger erstellen
-            racket = game.add.sprite(game.world.centerX - 30, 580, 'racket');
+            racket = game.add.sprite(game.world.centerX - 30, game.world.height - 20, 'racket');
             game.physics.arcade.enable(racket);
             // Gravitation & Impuls wirkt nicht auf den Schläger
             racket.body.immovable = true;
@@ -133,15 +140,21 @@
 
             if (cursors.left.isDown) {
                 // Links wurde gedrückt, also den Schläger nach links bewegen
-                racket.body.velocity.x = -150;
+                racket.body.velocity.x = -racketSpeed;
             }
             else if (cursors.right.isDown) {
                 // Rechts wurde gedrückt, also den Schläger nach links bewegen
-                racket.body.velocity.x = 150;
+                racket.body.velocity.x = racketSpeed;
             } else {
                 // Es wurde keine Taste gedrückt, also Schläger anhalten
                 racket.body.velocity.x = 0;
             }
+
+            // Powerups einsammeln
+            activePowerups.forEach(function(powerup) {
+                // Hat der Schläger ein Powerup eingesammlt? Falls ja, rufe onCollectPowerup() auf
+                game.physics.arcade.collide(powerup, racket, onCollectPowerup, null, this);
+            });
 
             // Ist der Ball aktuell auf dem Paddle und der Benutzer hat eine Taste gedrückt? Falls ja, Spiel starten!
             if (holdBall && (cursors.left.isDown || cursors.right.isDown)) {
@@ -154,15 +167,32 @@
         }
 
         /*
+         * Wird aufgerufen, wenn ein Powerup eingesammelt wird.
+         */
+        function onCollectPowerup(_powerup, _racket) {
+            // Powerup verschwinden lassen
+            _powerup.kill();
+
+            if (_powerup.key === 'powerup-speed') {
+                // Falls es ein Speed Power-up war, dann den Schläger schneller machen
+                racketSpeed += 50;
+            }
+
+            // Und aus der Liste der aktiven Powerups entfernen
+            var index = activePowerups.indexOf(_powerup);
+            activePowerups.splice(index, 1);
+        }
+
+        /*
          * Wird aufgerufen, wenn der Ball den Schläger trifft.
          */
         function onBallHitRacket(_ball, _racket) {
             if (_racket.body.velocity.x > 0) {
                 // Schläger bewegt sich nach rechts -> Dem Ball einen Impuls nach rechts geben
-                _ball.body.velocity.x = Math.min(ballSpeed, _ball.body.velocity.x + 25);
+                _ball.body.velocity.x = Math.min(ballSpeed, _ball.body.velocity.x + racketSpeed / 10);
             } else if (_racket.body.velocity.x < 0) {
                 // Schläger bewegt sich nach links -> Dem Ball einen Impuls nach links geben
-                _ball.body.velocity.x = Math.max(-ballSpeed, _ball.body.velocity.x - 25);
+                _ball.body.velocity.x = Math.max(-ballSpeed, _ball.body.velocity.x - racketSpeed / 10);
             }
         }
 
@@ -182,6 +212,47 @@
                 // Alle Blöcke wurden zerstört
                 allBricksDestroyed();
             }
+
+            createPowerup(brick.body.x, brick.body.y);
+        }
+
+        /*
+         * Erzeugt evtl. ein Power-Up.
+         */
+        function createPowerup(x, y) {
+            var rnd = Math.random();
+
+            var powerup = null;
+
+            if (rnd > 0 && rnd < 0.1) {
+                // Speed powerup erzeugen
+                powerup = game.add.sprite(x, y, 'powerup-speed');
+            } else if (rnd > 0.1 && rnd < 0.2) {
+
+            }
+
+            if (powerup) {
+                game.physics.arcade.enable(powerup);
+                // Powerup nach unten fallen lassen
+                powerup.body.velocity.y = 200;
+                // Bei den aktiven Powerups registrieren
+                activePowerups.push(powerup);
+                // Phaser soll überprüfen, wenn das Powerup aus der Welt fällt (ist nur unten möglich)
+                powerup.checkWorldBounds = true;
+                // Wenn das Powerup unten aus der Welt fällt, rufe onPowerupLost() auf
+                powerup.events.onOutOfBounds.add(onPowerupLost, this);
+            }
+        }
+
+        /*
+         * Wird aufgerufen, wenn ein Powerup unten aus der Welt gefallen ist
+         */
+        function onPowerupLost(_powerup) {
+            // Powerup entfernen
+            _powerup.kill();
+            // Und aus der Liste der aktiven Powerups entfernen
+            var index = activePowerups.indexOf(_powerup);
+            activePowerups.splice(index, 1);
         }
 
         /*
