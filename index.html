@@ -207,7 +207,7 @@
             // Und den Punkte-Text aktualisieren
             scoreText.text = 'score: ' + score;
 
-            if (bricks.countLiving() < 0) {
+            if (bricks.countLiving() == 0) {
                 // Alle Blöcke wurden zerstört
                 allBricksDestroyed();
             }
