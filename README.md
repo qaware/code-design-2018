@@ -2,6 +2,8 @@
 This repository contains the code for the Code+Design workshop, which takes place on November at [QAware](https://www.qaware.de/) in Munich.
 The goal is to create a breakout clone.
 
+![Screenshot](https://raw.githubusercontent.com/qaware/code-design-2018/master/screenshot.png)
+
 ## Required software
 
 * `npm -g http-server`
