@@ -21,12 +21,11 @@ The goal is to create a breakout clone.
 
 # Learning steps
 
-1. Setup empty Phaser project, start webserver, open game in browser
-1. Add racket to game (non-movable)
-1. Make racket move with cursor keys (left / right)
-1. Add ball to game (non-movable, over racket)
-1. Make ball move
-1. Make ball bounce of edges
+1. Setup empty Phaser project, start webserver, open game in browser (`git checkout step-1`)
+1. Add racket to game (non-movable) (`git checkout step-2`)
+1. Make racket move with cursor keys (left / right) (`git checkout step-3`)
+1. Add ball to game (non-movable, over racket) (`git checkout step-4`)
+1. Make ball move and bounce of edges (`git checkout step-5`)
 1. Make ball bounce of racket
 1. Make ball fall out of bottom
 1. Implement reset of ball if it falls out of bottom
