@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Breakout</title>
+    <script src="//cdn.jsdelivr.net/phaser/2.6.2/phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script type="text/javascript">
+
+        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+        function preload() {
+            game.load.image('background', 'assets/background.png');
+            game.load.image('racket', 'assets/racket.png');
+            game.load.image('ball', 'assets/ball.png');
+        }
+
+        var racket;
+        var ball;
+
+        function create() {
+            // Physik starten
+            game.physics.startSystem(Phaser.Physics.ARCADE);
+
+            // Wir ignorieren die untere Bildschirmkante
+            game.physics.arcade.checkCollision.down = false;
+
+            // Schläger erstellen
+            racket = game.add.sprite(400, 580, 'racket');
+            game.physics.arcade.enable(racket);            
+            // Gravitation & Impuls wirkt nicht auf den Schläger
+            racket.body.immovable = true;
+            // Schläger kann nicht aus der Welt bewegt werden
+            racket.body.collideWorldBounds = true;
+
+            // Ball erstellen
+            ball = game.add.sprite(400, 0, 'ball');            
+            game.physics.arcade.enable(ball);
+            // Ball hat 100% Elastizität und springt perfekt
+            ball.body.bounce.y = 1;
+            ball.body.bounce.x = 1;
+
+            // Der Ball hat eine zufällige Geschwindigkeit nach rechts oder links
+            ball.body.velocity.x = (Phaser.Math.between(0, 2) - 1) * 200;
+            // Der Ball hat eine festgelegte Geschwindigkeit nach unten
+            ball.body.velocity.y = 200;
+            // Der Ball kann nicht aus der Welt bewegt werden (außer nach unten)
+            ball.body.collideWorldBounds = true;
+
+            // Phaser soll überprüfen, wenn der Ball aus der Welt fällt (ist nur unten möglich)
+            ball.checkWorldBounds = true;
+            // Wenn der Ball unten aus der Welt fällt, rufe onBallLost() auf
+            ball.events.onOutOfBounds.add(onBallLost, this);
+        }
+
+        function update() {
+            var ballHit = game.physics.arcade.collide(racket, ball);
+
+            var cursors = game.input.keyboard.createCursorKeys();
+
+            if (cursors.left.isDown) {
+                racket.body.velocity.x = -150;
+            }
+            else if (cursors.right.isDown) {
+                racket.body.velocity.x = 150;
+            } else {
+                racket.body.velocity.x = 0;
+            }
+        }
+
+        function onBallLost() {
+            // Ball wieder oben starten lassen
+            ball.reset(400, 0);
+            // Der Ball hat eine zufällige Geschwindigkeit nach rechts oder links
+            ball.body.velocity.x = (Phaser.Math.between(0, 2) - 1) * 200;
+            // Der Ball hat eine festgelegte Geschwindigkeit nach unten
+            ball.body.velocity.y = 200;
+        }
+
+    </script>
+
+</body>
+
+</html>
