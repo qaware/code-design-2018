@@ -20,6 +20,13 @@
             type: Phaser.AUTO,
             width: 800,
             height: 600,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
             scene: {
                 preload: preload,
                 create: create,
@@ -29,15 +36,41 @@
 
         var game = new Phaser.Game(config);
 
+        var racket;
+        var ball;        
+
         function preload() {
             this.load.image('background', 'assets/background.png');
+            this.load.image('racket', 'assets/racket.png');
+            this.load.image('ball', 'assets/ball.png');
         }
 
         function create() {
             this.add.image(0, 0, 'background').setOrigin(0, 0);
+            racket = this.physics.add.sprite(360, 550, 'racket').setOrigin(0, 0);
+            racket.setCollideWorldBounds(true);
+            racket.body.setImmovable(true);
+            racket.setBounce(1);
+            
+            ball = this.physics.add.sprite(360, 0, 'ball').setOrigin(0, 0);
+            ball.setVelocityY(160);
+            ball.setVelocityX(Phaser.Math.FloatBetween(-1, 1) * 160);
+            ball.setCollideWorldBounds(true);
+            ball.setBounce(1);
+
+            this.physics.add.collider(racket, ball)
         }
 
         function update() {
+            cursors = this.input.keyboard.createCursorKeys();
+
+            if (cursors.right.isDown) {
+                racket.setVelocityX(160);
+            } else if (cursors.left.isDown) {
+                racket.setVelocityX(-160);
+            } else {
+                racket.setVelocityX(0)
+            }
         }
 
     </script>
