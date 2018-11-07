@@ -53,6 +53,7 @@
             game.load.image('ball', 'assets/ball.png');
             game.load.image('brick', 'assets/brick.png');
             game.load.image('powerup-speed', 'assets/powerup-speed.png');
+            game.load.image('powerup-size', 'assets/powerup-size.png');
         }
 
         /*
@@ -224,11 +225,9 @@
 
             var powerup = null;
 
-            if (rnd > 0 && rnd < 0.1) {
+            if (rnd >= 0 && rnd < 0.1) {
                 // Speed powerup erzeugen
                 powerup = game.add.sprite(x, y, 'powerup-speed');
-            } else if (rnd > 0.1 && rnd < 0.2) {
-
             }
 
             if (powerup) {
