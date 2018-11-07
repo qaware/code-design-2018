@@ -107,7 +107,6 @@
             for (var y = 0; y < 4; y++) {
                 for (var x = 0; x < 15; x++) {
                     var brick = bricks.create(120 + (x * 36), 100 + (y * 52), 'brick');
-                    brick.body.bounce.set(1);
                     brick.body.immovable = true;
                 }
             }
@@ -142,8 +141,7 @@
             if (cursors.left.isDown) {
                 // Links wurde gedrückt, also den Schläger nach links bewegen
                 racket.body.velocity.x = -racketSpeed;
-            }
-            else if (cursors.right.isDown) {
+            } else if (cursors.right.isDown) {
                 // Rechts wurde gedrückt, also den Schläger nach links bewegen
                 racket.body.velocity.x = racketSpeed;
             } else {
@@ -152,7 +150,7 @@
             }
 
             // Powerups einsammeln
-            activePowerups.forEach(function(powerup) {
+            activePowerups.forEach(function (powerup) {
                 // Hat der Schläger ein Powerup eingesammlt? Falls ja, rufe onCollectPowerup() auf
                 game.physics.arcade.collide(powerup, racket, onCollectPowerup, null, this);
             });
@@ -188,10 +186,10 @@
          * Wird aufgerufen, wenn der Ball den Schläger trifft.
          */
         function onBallHitRacket(_ball, _racket) {
-            if (_racket.body.velocity.x > 0) {
+            if (racket.body.velocity.x > 0) {
                 // Schläger bewegt sich nach rechts -> Dem Ball einen Impuls nach rechts geben
                 _ball.body.velocity.x = Math.min(ballSpeed, _ball.body.velocity.x + racketSpeed / 10);
-            } else if (_racket.body.velocity.x < 0) {
+            } else if (racket.body.velocity.x < 0) {
                 // Schläger bewegt sich nach links -> Dem Ball einen Impuls nach links geben
                 _ball.body.velocity.x = Math.max(-ballSpeed, _ball.body.velocity.x - racketSpeed / 10);
             }

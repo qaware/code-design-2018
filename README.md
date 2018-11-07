@@ -1,5 +1,6 @@
-# code-design-2018
+# Code for the Code+Design workshop 2018 at QAware Munich
 This repository contains the code for the Code+Design workshop, which takes place on November at [QAware](https://www.qaware.de/) in Munich.
+The goal is to create a breakout clone.
 
 ## Required software
 
