@@ -22,27 +22,10 @@
         var racket;
         // Ball
         var ball;
-        // Anzahl Leben
-        var lives = 3;
-        // Blöcke
-        var bricks;
-        // Punkte
-        var score = 0;
-        // Spiel läuft?
-        var running = true;
-
-        // Text zur Anzeige der Leben
-        var livesText;
-        // Text zur Anzeige der Punkte
-        var scoreText;
         // Geschwindigkeit des Balls
         var ballSpeed = 200;
         // Geschwindigkeit des Schlägers
         var racketSpeed = 200;
-        // Ist der Ball aktuell in der Startposition?
-        var holdBall = true;
-        // Aktive Powerups
-        var activePowerups = []
 
         /*
          * Wird von Phaser beim Laden des Spiels aufgerufen.
@@ -63,9 +46,6 @@
             // Physik starten
             game.physics.startSystem(Phaser.Physics.ARCADE);
 
-            // Wir ignorieren die untere Bildschirmkante bei der Kollisionsberechnung
-            game.physics.arcade.checkCollision.down = false;
-
             // Schläger erstellen
             racket = game.add.sprite(game.world.centerX - 30, game.world.height - 20, 'racket');
             game.physics.arcade.enable(racket);
@@ -83,33 +63,11 @@
             // Ball über dem Schläger platzieren
             resetBall();
 
-            // Der Ball kann nicht aus der Welt bewegt werden (außer nach unten)
+            // Der Ball kann nicht aus der Welt bewegt werden
             ball.body.collideWorldBounds = true;
 
-            // Phaser soll überprüfen, wenn der Ball aus der Welt fällt (ist nur unten möglich)
-            ball.checkWorldBounds = true;
-            // Wenn der Ball unten aus der Welt fällt, rufe onBallLost() auf
-            ball.events.onOutOfBounds.add(onBallLost, this);
-
-            // Text, der die Anzahl der Leben anzeigt
-            livesText = game.add.text(650, 550, 'lives: ' + lives, { font: "16px Courier New", fill: "#ffffff", align: "left" });
-
-            // Text, der die Punkte anzeigt
-            scoreText = game.add.text(32, 550, 'score: 0', { font: "16px Courier New", fill: "#ffffff", align: "left" });
-
-            // Blöcke erstellen (Gruppe von Objekten)
-            bricks = game.add.group();
-            // Alle Objekte der Gruppen sollen Physik haben
-            bricks.enableBody = true;
-            bricks.physicsBodyType = Phaser.Physics.ARCADE;
-
-            // Einzelne Blöcke erstellen
-            for (var y = 0; y < 4; y++) {
-                for (var x = 0; x < 15; x++) {
-                    var brick = bricks.create(120 + (x * 36), 100 + (y * 52), 'brick');
-                    brick.body.immovable = true;
-                }
-            }
+            ball.body.velocity.x = ballSpeed;
+            ball.body.velocity.y = ballSpeed;
         }
 
         /*
@@ -125,15 +83,8 @@
          * Wird von Phaser kontinuierlich aufgerufen.
          */
         function update() {
-            // Wenn das Spiel nicht mehr läuft, keine weiteren Aktionen mehr machen
-            if (!running)
-                return;
-
             // Wurde der Schläger vom Ball getroffen? Falls ja, rufe onBallHitRacket() auf
             game.physics.arcade.collide(ball, racket, onBallHitRacket, null, this);
-
-            // Wurde ein Block von dem Ball getroffen? Falls ja, rufe onBallHitBrick() auf
-            game.physics.arcade.collide(ball, bricks, onBallHitBrick, null, this);
 
             // Vom der Tastatur lesen
             var cursors = game.input.keyboard.createCursorKeys();
@@ -148,38 +99,6 @@
                 // Es wurde keine Taste gedrückt, also Schläger anhalten
                 racket.body.velocity.x = 0;
             }
-
-            // Powerups einsammeln
-            activePowerups.forEach(function (powerup) {
-                // Hat der Schläger ein Powerup eingesammlt? Falls ja, rufe onCollectPowerup() auf
-                game.physics.arcade.collide(powerup, racket, onCollectPowerup, null, this);
-            });
-
-            // Ist der Ball aktuell auf dem Paddle und der Benutzer hat eine Taste gedrückt? Falls ja, Spiel starten!
-            if (holdBall && (cursors.left.isDown || cursors.right.isDown)) {
-                holdBall = false;
-                // Der Ball hat eine zufällige Geschwindigkeit nach rechts oder links
-                ball.body.velocity.x = (Phaser.Math.between(0, 2) - 1) * ballSpeed;
-                // Der Ball hat eine festgelegte Geschwindigkeit nach unten
-                ball.body.velocity.y = ballSpeed;
-            }
-        }
-
-        /*
-         * Wird aufgerufen, wenn ein Powerup eingesammelt wird.
-         */
-        function onCollectPowerup(_powerup, _racket) {
-            // Powerup verschwinden lassen
-            _powerup.kill();
-
-            if (_powerup.key === 'powerup-speed') {
-                // Falls es ein Speed Power-up war, dann den Schläger schneller machen
-                racketSpeed += 50;
-            }
-
-            // Und aus der Liste der aktiven Powerups entfernen
-            var index = activePowerups.indexOf(_powerup);
-            activePowerups.splice(index, 1);
         }
 
         /*
@@ -194,111 +113,6 @@
                 _ball.body.velocity.x = Math.max(-ballSpeed, _ball.body.velocity.x - racketSpeed / 10);
             }
         }
-
-        /*
-         * Wird aufgerufen, wenn der Ball einen Block trifft.
-         */
-        function onBallHitBrick(_ball, brick) {
-            // Block löschen
-            brick.kill();
-
-            // Punkte erhöhen
-            score += 1;
-            // Und den Punkte-Text aktualisieren
-            scoreText.text = 'score: ' + score;
-
-            if (bricks.countLiving() == 0) {
-                // Alle Blöcke wurden zerstört
-                allBricksDestroyed();
-            }
-
-            createPowerup(brick.body.x, brick.body.y);
-        }
-
-        /*
-         * Erzeugt evtl. ein Power-Up.
-         */
-        function createPowerup(x, y) {
-            var rnd = Math.random();
-
-            var powerup = null;
-
-            if (rnd >= 0 && rnd < 0.1) {
-                // Speed powerup erzeugen
-                powerup = game.add.sprite(x, y, 'powerup-speed');
-            }
-
-            if (powerup) {
-                game.physics.arcade.enable(powerup);
-                // Powerup nach unten fallen lassen
-                powerup.body.velocity.y = 200;
-                // Bei den aktiven Powerups registrieren
-                activePowerups.push(powerup);
-                // Phaser soll überprüfen, wenn das Powerup aus der Welt fällt (ist nur unten möglich)
-                powerup.checkWorldBounds = true;
-                // Wenn das Powerup unten aus der Welt fällt, rufe onPowerupLost() auf
-                powerup.events.onOutOfBounds.add(onPowerupLost, this);
-            }
-        }
-
-        /*
-         * Wird aufgerufen, wenn ein Powerup unten aus der Welt gefallen ist
-         */
-        function onPowerupLost(_powerup) {
-            // Powerup entfernen
-            _powerup.kill();
-            // Und aus der Liste der aktiven Powerups entfernen
-            var index = activePowerups.indexOf(_powerup);
-            activePowerups.splice(index, 1);
-        }
-
-        /*
-         * Wird aufgerufen, wenn alle Blöcke zerstört sind.
-         */
-        function allBricksDestroyed() {
-            // Punkte erhöhen
-            score += 1000;
-            // Geschwindigkeit des Balls erhöhen
-            ballSpeed += 25;
-
-            // Jedes Level gibt ein neues Leben
-            lives += 1;
-            // Und den Text aktualisieren
-            livesText.text = 'lives: ' + lives;
-
-            // Alle Blöcke wieder herstellen
-            bricks.callAll('revive');
-        }
-
-        /*
-         * Wird aufgerufen, wenn der Ball das Spielfeld die untere Kante des Bildschirms erreicht.
-         */
-        function onBallLost() {
-            // Ball auf dem Schläger platzieren
-            resetBall();
-
-            // Ein Leben abziehen
-            lives--;
-            // Und den Text aktualisieren
-            livesText.text = 'lives: ' + lives;
-
-            // Wenn keine Leben mehr über sind, dann ist das Spiel aus
-            if (lives == 0) {
-                gameOver();
-            }
-        }
-
-        /*
-         * Wird aufgerufen, wenn der Spieler alle Leben verloren hat.
-         */
-        function gameOver() {
-            // Ball auf dem Schläger platzieren
-            resetBall();
-            // Text anzeigen. Spiel kann durch Neuladen der Seite wieder gestartet werden
-            livesText.text = 'Game over :('
-            running = false;
-        }
-
     </script>
 
 </body>
