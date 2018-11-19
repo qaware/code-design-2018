@@ -26,12 +26,14 @@ The goal is to create a breakout clone.
 1. Make racket move with cursor keys (left / right) (`git checkout step-3`)
 1. Add ball to game (non-movable, over racket) (`git checkout step-4`)
 1. Make ball move and bounce of edges (`git checkout step-5`)
-1. Make ball bounce of racket
-1. Make ball fall out of bottom
-1. Implement reset of ball if it falls out of bottom
-1. Add bricks
-1. Implement brick destruction if ball hits brick
-1. Add counter for destroyed bricks and lives
-1. Implement game over if lives reaches 0
-1. Implement new level if all bricks have been destroyed
-1. Implement power ups
+1. Make ball bounce of racket (`git checkout step-6`)
+1. Make ball fall out of bottom (`git checkout step-7`)
+1. Implement reset of ball if it falls out of bottom (`git checkout step-8`)
+1. Add bricks (`git checkout step-9`)
+1. Implement brick destruction if ball hits brick (`git checkout step-10`)
+1. Add counter for destroyed bricks and lives (`git checkout step-11`)
+1. Implement game over if lives reaches 0 (`git checkout step-12`)
+1. Implement new level if all bricks have been destroyed (`git checkout step-13`)
+1. Implement power ups (`git checkout step-14`)
+1. Implement that the ball is hold until player moves the racket (`git checkout step-15`)
+1. Implement ball spin - when moving the racket while the ball hits, the ball should get momentum (`git checkout step-16`)
