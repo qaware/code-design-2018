@@ -105,13 +105,6 @@
          * Wird aufgerufen, wenn der Ball den Schläger trifft.
          */
         function onBallHitRacket(_ball, _racket) {
-            if (racket.body.velocity.x > 0) {
-                // Schläger bewegt sich nach rechts -> Dem Ball einen Impuls nach rechts geben
-                _ball.body.velocity.x = Math.min(ballSpeed, _ball.body.velocity.x + racketSpeed / 10);
-            } else if (racket.body.velocity.x < 0) {
-                // Schläger bewegt sich nach links -> Dem Ball einen Impuls nach links geben
-                _ball.body.velocity.x = Math.max(-ballSpeed, _ball.body.velocity.x - racketSpeed / 10);
-            }
         }
     </script>
 
