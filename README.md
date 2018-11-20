@@ -14,6 +14,10 @@ The goal is to create a breakout clone.
 * `http-server .`
 * Open brower at http://localhost:8080/
 
+## Slides
+
+[](The slides) contain some code snippets useful for presenting before the steps and provide some guidance.
+
 ## Helpful links for development
 
 * Phaser API documentation: https://phaser.io/docs/2.6.2/index
