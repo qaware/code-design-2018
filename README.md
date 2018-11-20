@@ -16,7 +16,7 @@ The goal is to create a breakout clone.
 
 ## Slides
 
-[](The slides) contain some code snippets useful for presenting before the steps and provide some guidance.
+[The slides](https://github.com/qaware/code-design-2018/blob/master/Slides.odp) contain some code snippets useful for presenting before the steps and provide some guidance.
 
 ## Helpful links for development
 
