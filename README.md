@@ -41,3 +41,7 @@ The goal is to create a breakout clone.
 1. Implement power ups (`git checkout step-14`)
 1. Implement that the ball is hold until player moves the racket (`git checkout step-15`)
 1. Implement ball spin - when moving the racket while the ball hits, the ball should get momentum (`git checkout step-16`)
+
+# Further readings
+
+I've written a small documentation (in German) how to start and develop the game, see [this file](https://github.com/qaware/code-design-2018/blob/master/doc/Anleitung.pdf).
